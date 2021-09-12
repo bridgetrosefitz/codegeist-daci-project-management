@@ -1,0 +1,31 @@
+modules:
+  confluence:globalSettings:
+    - key: codegeist-daci-project-management-global-settings
+      function: global-settings
+      title: codegeist-daci-project-management
+      description: A hello world global settings.
+  confluence:homepageFeed:
+    - key: codegeist-daci-project-management-daci-panel
+      function: daci-panel
+      title: DACI Actions
+      description: A hello world homepage feed.
+  function:
+    - key: daci-panel
+      handler: index.daciPanel
+    - key: global-settings
+      handler: index.globalSettings
+  jira:customField:
+    - key: daci-informed-list
+      name: DACI Informed List
+      description: Tracks the users who have acknowledged that they have been informed on this issue.
+      collection: list
+      type: user
+permissions:
+  scopes:
+    - read:confluence-groups
+    - write:confluence-groups
+    - read:jira-work
+    - write:jira-work
+    - storage:app
+app:
+  id: ari:cloud:ecosystem::app/27b9ed67-1397-4f46-952e-4a4b7737e733
