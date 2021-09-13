@@ -20,6 +20,12 @@ modules:
       description: Tracks the users who have acknowledged that they have been informed on this issue.
       collection: list
       type: user
+    - key: daci-contributor-list
+      name: DACI Contributor List
+      description: Tracks users who have contributed to an issue.
+      type: object
+      formatter: 
+        expression: "`${value.comment} ${value.approval}`"
 permissions:
   scopes:
     - read:confluence-groups
