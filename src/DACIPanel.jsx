@@ -21,9 +21,16 @@ const App = () => {
   const [completedIssues, setCompletedIssues] = useState([]);
   const [userGroups, setUserGroups] = useState([])
   const [settings, setSettings] = useState({
-    users: [],
-    groups: [],
-    excludedUsers: []
+    contributor: {
+      groups: [],
+      users: [],
+      excludedUsers: [],
+    },
+    informed: {
+      groups: [],
+      users: [],
+      excludedUsers: [],
+    },
   })
 
   const userAcknowledged = issue => issue.fields[daciField.id].some(user => user.accountId === accountId)
@@ -44,7 +51,7 @@ const App = () => {
     const response = await api.asApp().requestJira(route`/rest/api/3/search?fields=*all`);
     const { issues } = await response.json()
     const settings = await getSettings()
-    const completedIssues = issues.filter(issue => issue.fields.status.id === settings[issue.fields.project.id])
+    const completedIssues = issues.filter(issue => issue.fields.status.id === settings.informed[issue.fields.project.id])
     setCompletedIssues(completedIssues)
     setSettings(settings)
   }
@@ -78,9 +85,9 @@ const App = () => {
     await getUserGroups()
   }, [])
 
-  const partOfInformedGlobalGroup = () => userGroups.some(userGroup => settings.groups.includes(userGroup))
-  const partOfInformedUserGlobalGroup = () =>  settings.users.includes(accountId)
-  const partOfInformedExcludeUserGlobalGroup = () => settings.excludedUsers.includes(accountId)
+  const partOfInformedGlobalGroup = () => userGroups.some(userGroup => settings.informed.groups.includes(userGroup))
+  const partOfInformedUserGlobalGroup = () =>  settings.informed.users.includes(accountId)
+  const partOfInformedExcludeUserGlobalGroup = () => settings.informed.excludedUsers.includes(accountId)
   const globalPermissions = () => (partOfInformedGlobalGroup() || partOfInformedUserGlobalGroup()) && !partOfInformedExcludeUserGlobalGroup()
 
   const needsAcknowledgmentIssues = completedIssues.filter(issue => !userAcknowledged(issue) && globalPermissions())

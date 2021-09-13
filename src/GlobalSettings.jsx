@@ -17,9 +17,16 @@ const App = () => {
   const [projects, setProjects] = useState([])
   const [statuses, setStatuses] = useState({})
   const [settings, setSettings] = useState({
-    groups: [],
-    users: [],
-    excludedUsers: [],
+    contributor: {
+      groups: [],
+      users: [],
+      excludedUsers: [],
+    },
+    informed: {
+      groups: [],
+      users: [],
+      excludedUsers: [],
+    },
   })
 
   const getProjects = async () => {
@@ -42,12 +49,26 @@ const App = () => {
   }
 
   const saveSettings = (settings) => {
+    settings.informed.groups = settings.informed.groups.map(group => group.value)
+    settings.informed.users = settings.informed.users.map(user => user.id)
+    settings.informed.excludedUsers = settings.informed.excludedUsers.map(user => user.id)
     // removes 'project-' from form key since I can't use a number for name of field
-    Object.entries(settings).forEach(([key]) => {
+    Object.entries(settings.informed).forEach(([key]) => {
       if (key.includes('project-')) {
         const newKey = key.replace('project-', '')
-        settings[newKey] = settings[key]
-        delete settings[key]
+        settings.informed[newKey] = settings.informed[key].value
+        delete settings.informed[key]
+      }
+    })
+    settings.contributor.groups = settings.contributor.groups.map(group => group.value)
+    settings.contributor.users = settings.contributor.users.map(user => user.id)
+    settings.contributor.excludedUsers = settings.contributor.excludedUsers.map(user => user.id)
+    // removes 'project-' from form key since I can't use a number for name of field
+    Object.entries(settings.contributor).forEach(([key]) => {
+      if (key.includes('project-')) {
+        const newKey = key.replace('project-', '')
+        settings.contributor[newKey] = settings.contributor[key].value
+        delete settings.contributor[key]
       }
     })
     storage.set('daci-global-settings', settings);
@@ -71,14 +92,43 @@ const App = () => {
     <Fragment>
       {groups.length > 0 && (
         <Form onSubmit={saveSettings} submitButtonText="Save">
+          <Heading size='medium'>Contributor Settings</Heading>
+          <Heading size='small'>Map projects to compeltion defintion</Heading>
+          {projects.map(project => (
+            <Fragment>
+              <Select label={`${project.name} completion status`} name={`contributor[project-${project.id}]`} description="Tell us what stats should kick off Informed">
+                {statuses[project.id].map(status => {
+                  return (
+                    <Option
+                      defaultSelected={settings.contributor[project.id] === status.id}
+                      value={status.id}
+                      label={status.name} />
+                  )
+                })}
+              </Select>
+            </Fragment>
+          ))}
+          <Heading size='small'>Default groups and people to be Informed</Heading>
+          <Select isMulti label="Groups" name="contributor[groups]" description="hellloooo">
+            {groups.map(group => (
+              <Option
+                defaultSelected={settings.contributor.groups.includes(group.name)}
+                value={group.name}
+                label={group.name} />
+            ))}
+          </Select>
+          <UserPicker defaultValue={settings.contributor.users} isMulti label="Users" name="contributor[users]" />
+          <UserPicker defaultValue={settings.contributor.excludedUsers} isMulti label="Excluded Users" name="contributor[excludedUsers]" />
+          
+          <Heading size='medium'>Informed Settings</Heading>
           <Heading size='small'>Map projects to compeltion defintion</Heading>
           {projects.map(project => (
           <Fragment>
-            <Select label={`${project.name} completion status`} name={`project-${project.id}`} description="Tell us what stats should kick off Informed">
+              <Select label={`${project.name} completion status`} name={`informed[project-${project.id}]`} description="Tell us what stats should kick off Informed">
               {statuses[project.id].map(status => {
                 return (
                 <Option
-                  defaultSelected={settings[project.id] === status.id}
+                  defaultSelected={settings.informed[project.id] === status.id}
                   value={status.id}
                   label={status.name} />
               )})}
@@ -86,16 +136,16 @@ const App = () => {
           </Fragment>
           ))}
           <Heading size='small'>Default groups and people to be Informed</Heading>
-          <Select isMulti label="Groups" name="groups" description="hellloooo">
+          <Select isMulti label="Groups" name="informed[groups]" description="hellloooo">
             {groups.map(group => (
               <Option
-                defaultSelected={settings.groups.includes(group.name)}
+                defaultSelected={settings.informed.groups.includes(group.name)}
                 value={group.name}
                 label={group.name} />
             ))}
           </Select>
-          <UserPicker defaultValue={settings.users} isMulti label="Users" name="users" />
-          <UserPicker defaultValue={settings.excludedUsers} isMulti label="Excluded Users" name="excludedUsers" />
+          <UserPicker defaultValue={settings.informed.users} isMulti label="Users" name="informed[users]" />
+          <UserPicker defaultValue={settings.informed.excludedUsers} isMulti label="Excluded Users" name="informed[excludedUsers]" />
         </Form>
       )}
     </Fragment>
