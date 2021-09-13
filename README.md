@@ -8,7 +8,7 @@
 
 D-A-C-I stands for Driver, Approver, Contributor, Informed.
 
-From my experience in both technical and non-technical roles, the DACI framework is extremely helpful. It enables me and my teammates to be clear about what each person is expected to do - and, importantly, what they're not expected to do! - and it promotes a good flow of information to the people who need it.
+From my experience in both technical and non-technical roles, the DACI framework is extremely helpful for project management. It enables me and my teammates to be clear about what each person is expected to do - and, importantly, what they're not expected to do! - and it promotes a timely flow of information to the people who need it.
 
 The DACI resources shared by Atlassian are an awesome starting point for teams. The [DACI Decision Making Framework Play](https://www.atlassian.com/team-playbook/plays/daci) introduces the value of the DACI framework, and provide instructions for putting it into practice to make decisions. The Confluence and Trello templates provide a written record of who is D-A-C-I for a given decision, which can be referred back to after the kick-off meeting. And the [DACI Helper app](https://bitbucket.org/atlassian/forge-daci-helper/src/master/) makes it easier to see where the framework has not been implemented.
 
