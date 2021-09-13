@@ -2,6 +2,7 @@ import ForgeUI, {
   render,
   Fragment,
   Heading,
+  Strong,
   Form,
   Select,
   Option,
@@ -9,6 +10,8 @@ import ForgeUI, {
   GlobalSettings,
   useEffect,
   useState,
+  Text,
+  Em
 } from '@forge/ui';
 import api, { route, storage } from '@forge/api';
 
@@ -92,11 +95,32 @@ const App = () => {
     <Fragment>
       {groups.length > 0 && (
         <Form onSubmit={saveSettings} submitButtonText="Save">
-          <Heading size='medium'>Contributor Settings</Heading>
-          <Heading size='small'>Map projects to compeltion defintion</Heading>
+          <Text>Specify which groups or users should be designated as <Strong>Contributor</Strong> and <Strong>Informed</Strong>, and when actions should be generated.</Text>
+          <Text>By default, an issue's assignee is designated as its <Strong>Driver</Strong>, and all users can view <Strong>Approver</Strong> health stats.</Text>
+          <Text>
+            {'———'}
+          </Text>
+          <Heading size='medium'>Contributor settings</Heading>
+          <Text><Strong>Groups and users</Strong></Text>
+          <Text>Choose which groups and users should be designated as <Strong>Contributor</Strong> to receive actions.</Text>
+          <Text>You can choose to exclude specific users, which overrides settings inherited from any groups that user belongs to.</Text>
+          <Text>This setting will be applied for issues in all projects.</Text>
+          <Select isMulti label="Groups" name="contributor[groups]" description="Select groups">
+            {groups.map(group => (
+              <Option
+                defaultSelected={settings.contributor.groups.includes(group.name)}
+                value={group.name}
+                label={group.name} />
+            ))}
+          </Select>
+          <UserPicker defaultValue={settings.contributor.users} isMulti label="Users" name="contributor[users]" description="Select users"/>
+          <UserPicker defaultValue={settings.contributor.excludedUsers} isMulti label="Excluded Users" name="contributor[excludedUsers]" description="Select users"/>
+          <Text><Strong>Status to generate action</Strong></Text>
+          <Text>For each project, choose from available issue statuses to specify when an action should be generated for the <Strong>Contributor</Strong>.</Text>
+          <Text><Strong>E.g.</Strong> when an issue is moved into "Needs Review", an action will appear in the DACI Action Panel for all Contributors to that issue.</Text>
           {projects.map(project => (
             <Fragment>
-              <Select label={`${project.name} completion status`} name={`contributor[project-${project.id}]`} description="Tell us what stats should kick off Informed">
+              <Select label={`Project name: ${project.name}`} name={`contributor[project-${project.id}]`} description="Select a status">
                 {statuses[project.id].map(status => {
                   return (
                     <Option
@@ -108,35 +132,15 @@ const App = () => {
               </Select>
             </Fragment>
           ))}
-          <Heading size='small'>Default groups and people to be Informed</Heading>
-          <Select isMulti label="Groups" name="contributor[groups]" description="hellloooo">
-            {groups.map(group => (
-              <Option
-                defaultSelected={settings.contributor.groups.includes(group.name)}
-                value={group.name}
-                label={group.name} />
-            ))}
-          </Select>
-          <UserPicker defaultValue={settings.contributor.users} isMulti label="Users" name="contributor[users]" />
-          <UserPicker defaultValue={settings.contributor.excludedUsers} isMulti label="Excluded Users" name="contributor[excludedUsers]" />
-          
-          <Heading size='medium'>Informed Settings</Heading>
-          <Heading size='small'>Map projects to compeltion defintion</Heading>
-          {projects.map(project => (
-          <Fragment>
-              <Select label={`${project.name} completion status`} name={`informed[project-${project.id}]`} description="Tell us what stats should kick off Informed">
-              {statuses[project.id].map(status => {
-                return (
-                <Option
-                  defaultSelected={settings.informed[project.id] === status.id}
-                  value={status.id}
-                  label={status.name} />
-              )})}
-            </Select>
-          </Fragment>
-          ))}
-          <Heading size='small'>Default groups and people to be Informed</Heading>
-          <Select isMulti label="Groups" name="informed[groups]" description="hellloooo">
+          <Text>
+            {'———'}
+          </Text>
+          <Heading size='medium'>Informed settings</Heading>
+          <Text><Strong>Groups and users</Strong></Text>
+          <Text>Choose which groups and users should be designated as <Strong>Informed</Strong> to receive actions.</Text>
+          <Text>You can choose to exclude specific users, which overrides settings inherited from any groups that user belongs to.</Text>
+          <Text>This setting will be applied for issues in all projects.</Text>
+          <Select isMulti label="Groups" name="informed[groups]" description="Select groups">
             {groups.map(group => (
               <Option
                 defaultSelected={settings.informed.groups.includes(group.name)}
@@ -144,8 +148,25 @@ const App = () => {
                 label={group.name} />
             ))}
           </Select>
-          <UserPicker defaultValue={settings.informed.users} isMulti label="Users" name="informed[users]" />
-          <UserPicker defaultValue={settings.informed.excludedUsers} isMulti label="Excluded Users" name="informed[excludedUsers]" />
+          <UserPicker defaultValue={settings.informed.users} isMulti label="Users" name="informed[users]" description="Select users"/>
+          <UserPicker defaultValue={settings.informed.excludedUsers} isMulti label="Excluded Users" name="informed[excludedUsers]" description="Select users"/>
+          <Text><Strong>Status to generate action</Strong></Text>
+          <Text>For each project, choose from available issue statuses to specify when an action should be generated for <Strong>Informed</Strong> users.</Text>
+          <Text><Strong>E.g.</Strong> when an issue is moved into "Done", an action will appear in the DACI Action Panel for all who are Informed on that issue.</Text>
+          {projects.map(project => (
+            <Fragment>
+              <Select label={`Project name: ${project.name}`} name={`informed[project-${project.id}]`} description="Select a status">
+                {statuses[project.id].map(status => {
+                  return (
+                    <Option
+                      defaultSelected={settings.informed[project.id] === status.id}
+                      value={status.id}
+                      label={status.name} />
+                  )
+                })}
+              </Select>
+            </Fragment>
+          ))}
         </Form>
       )}
     </Fragment>

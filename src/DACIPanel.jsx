@@ -21,10 +21,10 @@ import ForgeUI, {
   SectionMessage,
   Avatar,
   Fragment,
-  Strong
+  Strong,
+  Em
 } from '@forge/ui';
 import api, { route, storage } from '@forge/api';
-
 
 const App = () => {
   const { accountId } = useProductContext();
@@ -170,14 +170,14 @@ const App = () => {
 
 
   const driverPotentialActionableIssues = driverIssues.filter(issue => issue.fields[daciContributorField.id] && issue.fields[daciContributorField.id].contributors.length > 0)
-  const driverActionableIssues = driverPotentialActionableIssues.filter(issue => !issue.fields[daciContributorField.id].contributors.some(user => user.driverAcknowledgedAccountId === accountId))
-  const driverActionedIssues = driverPotentialActionableIssues.filter(issue => issue.fields[daciContributorField.id].contributors.some(user => user.driverAcknowledgedAccountId === accountId))
+  const driverActionableIssues = driverPotentialActionableIssues.filter(issue => issue.fields[daciContributorField.id] && !issue.fields[daciContributorField.id].contributors.some(user => user.driverAcknowledgedAccountId === accountId))
+  const driverActionedIssues = driverPotentialActionableIssues.filter(issue => issue.fields[daciContributorField.id] && issue.fields[daciContributorField.id].contributors.some(user => user.driverAcknowledgedAccountId === accountId))
 
   const numberOfActionsThatCouldBeTaken = driverPotentialActionableIssues.length
-  const numberOfActionsCompleted = driverPotentialActionableIssues.filter(issue => issue.fields[daciContributorField.id].contributors.some(user => user.driverAcknowledgedAccountId)).length
+  const numberOfActionsCompleted = driverPotentialActionableIssues.filter(issue => issue.fields[daciContributorField.id] && issue.fields[daciContributorField.id].contributors.some(user => user.driverAcknowledgedAccountId)).length
 
   const numberOfTotalContributionsThatCouldBeTaken = contributorIssues.length
-  const numberOfContributionsMade = contributorIssues.filter(issue => issue.fields[daciContributorField.id].contributors.some(user => user.accountId)).length
+  const numberOfContributionsMade = contributorIssues.filter(issue => issue.fields[daciContributorField.id] && issue.fields[daciContributorField.id].contributors.some(user => user.accountId)).length
   let numberOfTimesIssuesHaveBeenInformed = 0
   issues.forEach(issue => issue.fields[daciInformedField.id].forEach(() => numberOfTimesIssuesHaveBeenInformed++))
 
@@ -186,17 +186,45 @@ const App = () => {
     <Tabs>
       <Tab label={`Driver (${driverActionableIssues.length})`}>
         {driverActionableIssues.length > 0 && (
-          <Heading size="small">To do</Heading>
+    
+            <Text><Strong>To do</Strong></Text>
         )}
         {
           driverActionableIssues.map(issue => issue.fields[daciContributorField.id].contributors.map(user => (
-            <SectionMessage title={issue.fields.summary} appearance="change">
-              <Text>
-                <Link href={`/browse/${issue.key}`}>Link to Issue</Link>
-              </Text>
-              <Text>{user.approved ? "👍" : "👎"} "{user.comment}"</Text>
-              <Avatar accountId={user.accountId}/>
-              <Button text="This is dealt with" onClick={() => driverDealWithFeedback(issue, user)} />
+            <SectionMessage title={`Contribution needs review`} appearance="change">
+              <Table>
+                <Head>
+                  <Cell>
+                    <Text>Issue</Text>
+                  </Cell>
+                  <Cell>
+                    <Text>Contributor</Text>
+                  </Cell>
+                  <Cell>
+                    <Text>Status</Text>
+                  </Cell>
+                  <Cell>
+                    <Text>Comment</Text>
+                  </Cell>
+                </Head>
+                <Row>
+                  <Cell>
+                    <Text>
+                        <Link href={`/browse/${issue.key}`}>{issue.fields.summary}</Link>
+                    </Text>
+                  </Cell>
+                  <Cell>
+                      <Avatar accountId={user.accountId} />
+                  </Cell>
+                  <Cell>
+                      <Text>{user.approved ? "👍" : "👎"}</Text>
+                  </Cell>
+                  <Cell>
+                      <Text><Em>{user.comment}</Em></Text>
+                  </Cell>
+                </Row>
+              </Table>
+              <Button icon="check" text="This contribution is dealt with" onClick={() => driverDealWithFeedback(issue, user)} />
             </SectionMessage>
           ))).flat()
         }
@@ -212,7 +240,7 @@ const App = () => {
                 <Text>Contributor</Text>
               </Cell>
               <Cell>
-                <Text>Approval</Text>
+                <Text>Status</Text>
               </Cell>
               <Cell>
                 <Text>Comment</Text>
@@ -233,7 +261,7 @@ const App = () => {
                   <Text>{user.approved ? "👍" : "👎"}</Text>
                 </Cell>
                 <Cell>
-                  <Text>"{user.comment}"</Text>
+                    <Text><Em>{user.comment}</Em></Text>
                 </Cell>
               </Row>
             ))).flat()
@@ -243,35 +271,41 @@ const App = () => {
         )}
       </Tab>
       <Tab label={`Approver`}>
+      
         <Fragment>
-          <Heading size="small">Health Stats</Heading>
-          {/* {driverPotentialActionableIssues.length} */}
-          <Heading size="medium">
-            <Text><Strong>{numberOfActionsCompleted}</Strong> of <Strong>{numberOfActionsThatCouldBeTaken} Driver Issues</Strong> are incorporating <Strong>Contributor's Feedback</Strong>: {((parseFloat(numberOfActionsCompleted) / parseFloat(numberOfActionsThatCouldBeTaken)) * 100).toFixed(2)}%</Text>
-          </Heading>
-          <Heading size="medium">
-            <Text><Strong>{numberOfContributionsMade}</Strong> of <Strong>{numberOfTotalContributionsThatCouldBeTaken} Contributor's Feedback</Strong> is being written: {((parseFloat(numberOfContributionsMade) / parseFloat(numberOfTotalContributionsThatCouldBeTaken)) * 100).toFixed(2)}%</Text>
-          </Heading>
-          <Heading size="medium">
-            <Text>Users have been <Strong>Informed</Strong> of issues <Strong>{numberOfTimesIssuesHaveBeenInformed}</Strong> times</Text>
-          </Heading>
+          <Heading size="small">Health stats</Heading>
+          <SectionMessage 
+            appearance="info"
+            title={`Driver`}>
+            <Text>Drivers have dealth with {numberOfActionsCompleted} of {numberOfActionsThatCouldBeTaken} Contributor submissions <Strong>({((parseFloat(numberOfActionsCompleted) / parseFloat(numberOfActionsThatCouldBeTaken)) * 100).toFixed(0)}%)</Strong></Text>
+          </SectionMessage>
+          <SectionMessage 
+            appearance="info"
+            title={`Contributor`}>
+            <Text>Contributors have made their submissions for {numberOfContributionsMade} of {numberOfTotalContributionsThatCouldBeTaken} issues <Strong>({((parseFloat(numberOfContributionsMade) / parseFloat(numberOfTotalContributionsThatCouldBeTaken)) * 100).toFixed(0)}%)</Strong> </Text>
+            </SectionMessage>
+          <SectionMessage 
+            appearance="info"
+            title={`Informed`}>
+             <Text>Users have been informed of issues {numberOfTimesIssuesHaveBeenInformed} times</Text>
+             </SectionMessage>
         </Fragment>
       </Tab>
-      <Tab label={`Contributions ${needsContributorCount}`}>
+      <Tab label={`Contributor ${needsContributorCount}`}>
         {needsContributorIssues.length > 0 && (
           <Heading size="small">To do</Heading>
         )}
         {needsContributorIssues.map(issue => (
-          <SectionMessage title={issue.fields.summary} appearance="change">
+          <SectionMessage title={`Issue needs contribution: ${issue.fields.summary}`} appearance="change">
             <Text>
-              <Link href={`/browse/${issue.key}`}>Link to Issue</Link>
+              <Link openNewTab href={`/browse/${issue.key}`}>View issue in Jira</Link>
             </Text>
-            <Form onSubmit={(data) => contributeToIssue(issue, data)} submitButtonText="Consult this task">
-              <RadioGroup isRequired name="approval" label="approve this task" description="please approve this task">
+            <Form onSubmit={(data) => contributeToIssue(issue, data)} submitButtonText="Submit contribution">
+              <RadioGroup isRequired name="approval" label="Give this issue a thumbs up or down" >
                 <Radio label="👍" value="true" />
                 <Radio label="👎" value="false" />
               </RadioGroup>
-              <TextArea label="Message" name="message" />
+              <TextArea label="Give detailed comment (optional)" name="message" />
             </Form>
           </SectionMessage>
         ))}
@@ -282,7 +316,7 @@ const App = () => {
               <Text>Issue</Text>
             </Cell>
             <Cell>
-              <Text>Approval</Text>
+              <Text>Status</Text>
             </Cell>
             <Cell>
               <Text>Comment</Text>
@@ -299,7 +333,7 @@ const App = () => {
                 <Text>{issue.fields[daciContributorField.id].contributors.find(user => user.accountId === accountId).approved ? "👍" : "👎"}</Text>
               </Cell>
               <Cell>
-                <Text>"{issue.fields[daciContributorField.id].contributors.find(user => user.accountId === accountId).comment}"</Text>
+                <Text><Em>{issue.fields[daciContributorField.id].contributors.find(user => user.accountId === accountId).comment}</Em></Text>
               </Cell>
             </Row>
           ))}
@@ -310,10 +344,21 @@ const App = () => {
           <Heading size="small">To do</Heading>
         )}
         {needsAcknowledgmentIssues.map(issue => (
-          <SectionMessage title={issue.fields.summary} appearance="info">
-            <Text>
-              <Link href={`/browse/${issue.key}`}>Link to Issue</Link>
-            </Text>
+          <SectionMessage title={`Acknowledge issue: ${issue.fields.summary}`} appearance="info">
+            <Table>
+              <Head>
+                <Cell>
+                  <Text>Issue</Text>
+                </Cell>
+              </Head>
+              <Row>
+                <Cell>
+                  <Text>
+                    <Link href={`/browse/${issue.key}`}>{issue.fields.summary}</Link>
+                  </Text>
+                </Cell>
+              </Row>
+            </Table>
             <Button text="I'm informed" onClick={() => acknowledgeIssue(issue)} />
           </SectionMessage>
         ))}
@@ -321,7 +366,7 @@ const App = () => {
         <Table>
           <Head>
             <Cell>
-              <Text>Acknowledged Issue</Text>
+              <Text>Issue</Text>
             </Cell>
           </Head>
           {acknowledgedIssues.map(issue => (
