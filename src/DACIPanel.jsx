@@ -180,7 +180,20 @@ const App = () => {
   const numberOfContributionsMade = contributorIssues.filter(issue => issue.fields[daciContributorField.id] && issue.fields[daciContributorField.id].contributors.some(user => user.accountId)).length
   let numberOfTimesIssuesHaveBeenInformed = 0
   issues.forEach(issue => issue.fields[daciInformedField.id].forEach(() => numberOfTimesIssuesHaveBeenInformed++))
-
+  let totalContributions = 0
+  let totalPotentialContributions = 0
+  contributorIssues.forEach(issue => issue.fields[daciContributorField.id] && issue.fields[daciContributorField.id].contributors.forEach(user => {
+    if (user.driverAcknowledgedAccountId) {
+      totalContributions++
+    }
+    totalPotentialContributions++
+  }))
+  completedIssues.forEach(issue => issue.fields[daciContributorField.id] && issue.fields[daciContributorField.id].contributors.forEach(user => {
+    if (user.driverAcknowledgedAccountId) {
+      totalContributions++
+    }
+    totalPotentialContributions++
+  }))
   
   return (
     <Tabs>
@@ -277,12 +290,12 @@ const App = () => {
           <SectionMessage 
             appearance="info"
             title={`Driver`}>
-            <Text>Drivers have dealth with {numberOfActionsCompleted} of {numberOfActionsThatCouldBeTaken} Contributor submissions <Strong>({((parseFloat(numberOfActionsCompleted) / parseFloat(numberOfActionsThatCouldBeTaken)) * 100).toFixed(0)}%)</Strong></Text>
+            <Text>Drivers have dealt with {totalContributions} of {totalPotentialContributions} Contributor submissions <Strong>({((parseFloat(totalContributions) / parseFloat(totalPotentialContributions)) * 100).toFixed(0)}%)</Strong></Text>
           </SectionMessage>
           <SectionMessage 
             appearance="info"
             title={`Contributor`}>
-            <Text>Contributors have made their submissions for {numberOfContributionsMade} of {numberOfTotalContributionsThatCouldBeTaken} issues <Strong>({((parseFloat(numberOfContributionsMade) / parseFloat(numberOfTotalContributionsThatCouldBeTaken)) * 100).toFixed(0)}%)</Strong> </Text>
+            <Text>Contributors have made their submissions for {totalPotentialContributions} of {totalPotentialContributions} issues <Strong>({((parseFloat(totalPotentialContributions) / parseFloat(totalPotentialContributions)) * 100).toFixed(0)}%)</Strong> </Text>
             </SectionMessage>
           <SectionMessage 
             appearance="info"
