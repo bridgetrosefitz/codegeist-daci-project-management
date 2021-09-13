@@ -23,8 +23,9 @@ There is more room for D-A-C-I to make our lives easier, for teams that use Jira
 
 XXX
 
-
 ## What does the app do?
+
+XXX
 
 ### Functionality
 
@@ -32,7 +33,8 @@ XXX
 
 ### Design choices
 
-XXX
+- Features need to be heavy on automation and be built directly into team members' workflow, as much as possible. It takes a lot of effort to diligently apply DACI principles at each stage of a product sprint or a project. For example, it is extra work for a product team member or a manager to remember to update customer support in a timely way when a bug fix is shipped, instead of just archiving the issue and moving on to the next. If we're honest, this means teams probably won't use DACI as much as would be ideal. With this in mind, I XXX
+- DACI actions and statuses need to be as easily visible as possible, because I believe if you can't see something, you can't fix something. With this in mind, I decided to put DACI actions and updates all in one place, in a dedicated DACI Action Panel, right next to the regular Announcements and Feed sections of Confluence.
 
 ## How I built the app
 
@@ -53,10 +55,26 @@ This experience has been my entrée into the Forge environment, and was my first
 
 At a meta level, I developed my thinking about the contexts in which DACI can be applied. I had never explicitly thought about the difference between how DACI can be applied at a decision-making level vs a project management level. My personal experience with DACI encompassed both and I had never drawn a distinction between the two. Reading the Atlassian playbook docs and templates made me see how DACI can play out somewhat differently in a decision-making context, as opposed to in project management. Decision-making is in some ways more static and centralized than project management, where many different granular tasks are carried out and are constantly changing. This leads to a different implementation problem for DACI in each context. It seems to me that decision-making is more suited to a single fixed document treatment of DACI, whereas in project management requires DACI to be inserted into the workflow in a dynamic yet structured way.
 
+## Challenges I faced
+
+In the initial stages of building the logic for my app, I spent a lot of time understanding and experimenting with API endpoints to figure out two core things:
+1. Make GET requests to return issues, understanding the structure and syntax of the objects returned
+2. Make POST AND PUT requests for creating custom fields.
+
+Many things were easy about Forge - these two things were not. Specifically, I had the following struggles:
+- XXX
+- XXX
+- XXX
+
+Apart from early technical frustrations, an important challenge was deciding on the core functionality of the app: what features should I build which would add value compared to what already exists in Jira and Confluence, to simplify the implementation of DACI? 
+
+I spent a bunch of time trying to fit existing features like 'Watching', notifications and emails to DACI. But the essence of the value I wanted to build was to bring DACI-related actions into team members' workflows, and build checks to monitor the health of these actions across the team. If I had used watching, notifications or emails, these features would have been overloaded with different purposes, making team members' workflows more distracted and the required action less clear. 
+
+In the end, for this first version of the app, I decided to focus on a few core automated features I wish I had had on projects in the past (see Functionality section).
 
 ## Where to next?
 
-I Was only able to throw myself into the Codegeist hackathon for a few days before the deadline. But I wanted to build something because I'm bloody passionate about DACI, and I was excited about the way it could be more tightly integrated into Jira and Confluence. 
+I was only able to throw myself into the Codegeist hackathon for a few days before the deadline. But I wanted to build something because I'm bloody passionate about DACI, and I was excited about the way it could be more tightly integrated into Jira and Confluence. 
 
 In future, the app could be expanded to:
 - XXX
