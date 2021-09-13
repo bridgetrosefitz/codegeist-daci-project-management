@@ -76,8 +76,10 @@ This experience has been my entrée into the Forge environment, and was my first
 At a meta level, I developed my thinking about the contexts in which DACI can be applied. I had never explicitly thought about the difference between how DACI can be applied at a decision-making level vs a project management level. My personal experience with DACI encompassed both of these, and I had never drawn a distinction between the two. Reading the Atlassian playbook docs and templates made me see how DACI can play out somewhat differently in a decision-making context, as opposed to in project management. Decision-making is in some ways more static and centralized than project management, where many different granular tasks are carried out and are constantly changing. This leads to a different implementation problem for DACI in each context. It seems to me that decision-making is more suited to a single fixed document treatment of DACI, whereas project management requires DACI to be inserted into the workflow in a dynamic yet structured way.
 
 ## What's next for DACI Project Management for Jira and Confluence
-- I would love to revisit the styling of the app. Because I believe good design makes people trust a product
-- I would love to link into Jira's flagging functionality to automatically notify the Approver that someone is doing work outside their role
-- Create time / expectation-based functionality for things such as, if a Driver has not dealt with a Contributor's item, if a Contributor hasn't given feedback, if an Informed person has not acknowledged for X days... what to do about that. For example, send a notification, make a new action item for the Approver to follow up; have an alert message on the Project.
-- Status and workflow restrictions based on DACI settings. For example, you cannot move an issue from Needs Review to Done without all contributors signing off
-- Enhance project-level settings, so that the people who are D-A-C-I can be set at the project level not the company level
+I would love to:
+- revisit the styling of the app. Because I believe good design makes people trust a product
+- link into Jira's flagging functionality to automatically notify the Approver that someone is doing work outside their role
+-  build time / expectation-based functionality for things such as if a Driver has not dealt with a Contributor's item, if a Contributor hasn't given feedback, if an Informed person has not acknowledged for X days... what to do about that. For example, send a notification, make a new action item for the Approver to follow up; have an alert message on the Project.
+- build status and workflow restrictions based on DACI settings. For example, you cannot move an issue from Needs Review to Done without all contributors signing off
+- enhance project-level settings, so that the people who are D-A-C-I can be set at the project level not the company level
+
