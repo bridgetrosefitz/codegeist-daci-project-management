@@ -10,9 +10,8 @@ import ForgeUI, {
   useProductContext,
   Tabs,
   Tab,
-  Heading
 } from '@forge/ui';
-import api, { route } from '@forge/api';
+import api, { route, storage } from '@forge/api';
 
 
 const App = () => {
@@ -20,8 +19,19 @@ const App = () => {
 
   const [daciField, setDaciField] = useState(null);
   const [completedIssues, setCompletedIssues] = useState([]);
+  const [userGroups, setUserGroups] = useState([])
+  const [settings, setSettings] = useState({
+    users: [],
+    groups: [],
+    excludedUsers: []
+  })
 
   const userAcknowledged = issue => issue.fields[daciField.id].some(user => user.accountId === accountId)
+  
+  const getSettings = async () => {
+    const globalDaciSettings = await storage.get('daci-global-settings');
+    return globalDaciSettings
+  }
 
   const getDaciField = async () => {
     const response = await api.asApp().requestJira(route`/rest/api/3/field`);
@@ -33,10 +43,19 @@ const App = () => {
   const getIssues = async () => {
     const response = await api.asApp().requestJira(route`/rest/api/3/search?fields=*all`);
     const { issues } = await response.json()
-    const completedIssues = issues.filter(issue => issue.fields.status.name === 'Done')
+    const settings = await getSettings()
+    const completedIssues = issues.filter(issue => issue.fields.status.id === settings[issue.fields.project.id])
     setCompletedIssues(completedIssues)
+    setSettings(settings)
   }
 
+  const getUserGroups = async () => {
+    const response = await api.asApp().requestJira(route`/rest/api/3/user/groups?accountId=${accountId}`)
+    const groups = await response.json()
+    const groupNames = groups.map(group => group.name)
+    setUserGroups(groupNames)
+  }
+  
   const acknowledgeIssue = async (issue) => {
     const informedUsers = issue.fields[daciField.id] || [];
     if (!userAcknowledged(issue)) {
@@ -52,14 +71,20 @@ const App = () => {
       await getIssues()
     }
   }
-
+  
   useEffect(async () => {
     await getDaciField()
     await getIssues()
+    await getUserGroups()
   }, [])
 
-  const needsAcknowledgmentIssues = completedIssues.filter(issue => !userAcknowledged(issue))
-  const acknowledgedIssues = completedIssues.filter(issue => userAcknowledged(issue))
+  const partOfInformedGlobalGroup = () => userGroups.some(userGroup => settings.groups.includes(userGroup))
+  const partOfInformedUserGlobalGroup = () =>  settings.users.includes(accountId)
+  const partOfInformedExcludeUserGlobalGroup = () => settings.excludedUsers.includes(accountId)
+  const globalPermissions = () => (partOfInformedGlobalGroup() || partOfInformedUserGlobalGroup()) && !partOfInformedExcludeUserGlobalGroup()
+
+  const needsAcknowledgmentIssues = completedIssues.filter(issue => !userAcknowledged(issue) && globalPermissions())
+  const acknowledgedIssues = completedIssues.filter(issue => userAcknowledged(issue) && globalPermissions())
   const needsAcknowledgmentCount = needsAcknowledgmentIssues.length > 0 ? ` (${needsAcknowledgmentIssues.length})` : ''
   return (
     <Tabs>

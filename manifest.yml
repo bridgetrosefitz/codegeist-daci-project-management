@@ -1,9 +1,9 @@
 modules:
   confluence:globalSettings:
-    - key: codegeist-daci-project-management-global-settings
+    - key: daci-project-management-global-settings
       function: global-settings
-      title: codegeist-daci-project-management
-      description: A hello world global settings.
+      title: DACI Project Management Settings
+      description: Configure your global settings for DACI.
   confluence:homepageFeed:
     - key: codegeist-daci-project-management-daci-panel
       function: daci-panel
@@ -24,6 +24,7 @@ permissions:
   scopes:
     - read:confluence-groups
     - write:confluence-groups
+    - read:jira-user
     - read:jira-work
     - write:jira-work
     - storage:app
